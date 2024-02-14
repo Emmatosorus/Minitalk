@@ -1,0 +1,45 @@
+unistd.h :
+
+int usleep(useconds_t usec);
+suspends exec for usec microseconds
+errno : yes
+
+unsigned int sleep(unsigned int seconds);
+suspends exec for seconds seconds
+errno : no
+
+int pause(void);
+suspends exec until a signal is received
+errno : yes
+
+pid_t getpid(void);
+return process ID
+
+signal.h :
+
+int kill(pid_t pid, int sig);
+send any signal sig to the process pid
+if sig == 0 verifies if process if pid is accesible
+errno : yes
+
+int sigaction(int signum, const struct sigaction *_Nullable restrict act, struct sigaction *_Nullable restrict oldact);
+changes action taken by the process when it receives a specific signal
+errno : no
+
+struct sigaction {
+	void		(*sa_handler)(int);
+	void		(*sa_sigaction)(int, siginfo_t *, void *);
+	sigset_t	sa_mask;
+	int			sa_flags;
+	void		(*sa_restorer)(void);
+};
+
+int sigaddset(sigset_t *set, int signo);
+adds the individual signal specified by
+the signo to the signal set pointed to by set.
+errno : yes
+
+int sigemptyset(sigset_t *set);
+initializes the signal set pointed to
+by set
+errno : yes
