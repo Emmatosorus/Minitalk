@@ -31,7 +31,7 @@ C_OBJ = $(C_SRC:%.c=$(OBJ_DIR)%.o)
 
 all : Makefile
 	$(MAKE) $(NAME_S)
-	# $(MAKE) $(NAME_C)
+	$(MAKE) $(NAME_C)
 
 $(OBJ_DIR)%.o: %.c $(HDR)
 	mkdir -p $(OBJ_DIR)src/

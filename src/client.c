@@ -6,7 +6,7 @@
 /*   By: epolitze <epolitze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 20:24:35 by epolitze          #+#    #+#             */
-/*   Updated: 2024/02/14 20:13:44 by epolitze         ###   ########.fr       */
+/*   Updated: 2024/02/15 10:31:40 by epolitze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,15 +33,15 @@ void	get_pid(int *pid, char *nb)
 	}
 }
 
-void	send_size(int pid, size_t nb)
+void	send_char(int pid, int c)
 {
 	int	i;
 
-	i = (sizeof(size_t) * 8) - 1;
+	i = (sizeof(char) * 8) - 1;
 	(void)pid;
 	while (i >= 0)
 	{
-		if ((nb >> i) & 1)
+		if ((c >> i) & 1)
 			kill(pid, SIGUSR1);
 		else
 			kill(pid, SIGUSR2);
@@ -52,8 +52,9 @@ void	send_size(int pid, size_t nb)
 
 int	main(int ac, char **av)
 {
-	size_t	len;
-	int	pid;
+	size_t				len;
+	int					pid;
+	struct sigaction	act;
 
 	if (ac < 3)
 	{
@@ -62,7 +63,15 @@ int	main(int ac, char **av)
 		exit(EXIT_FAILURE);
 	}
 	get_pid(&pid, av[1]);
+	act.sa_handler = &send_char;
+	act.sa_flags = SA_SIGINFO;
+	sigemptyset(&act.sa_mask);
+	sigaction(SIGUSR1, &act, NULL);
+	sigaction(SIGUSR2, &act, NULL);
 	len = ft_strlen(av[2]);
-	ft_printf(1, "%d\n", len);
-	send_size(pid, len);
+	while (len > 0)
+	{
+		len--;
+		pause();
+	}
 }

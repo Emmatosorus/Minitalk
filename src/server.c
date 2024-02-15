@@ -6,7 +6,7 @@
 /*   By: epolitze <epolitze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 20:29:00 by epolitze          #+#    #+#             */
-/*   Updated: 2024/02/14 20:15:16 by epolitze         ###   ########.fr       */
+/*   Updated: 2024/02/15 10:38:45 by epolitze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,10 @@
 
 void get_size (int sig)
 {
-	static size_t	result = 0;;
+	static char		result = 0;
 	static int		i = 0;
 
-	if (i < 64)
+	if (i < 8)
 	{
 		result <<= 1;
 		if (sig == SIGUSR1)
@@ -27,13 +27,13 @@ void get_size (int sig)
 		i++;
 	}
 	//ft_printf(1, "%d. %d\n", i, result);
-	if (i == 64)
+	if (i == 8)
 	{
-		ft_printf(1, "%d\n", result);
+		//ft_printf(1, "%c\n", result);
+		write(1, &result, 1);
 		i = 0;
 		result = 0;
 	}
-		
 }
 
 int	main(void)
@@ -51,6 +51,7 @@ int	main(void)
 	while (1)
 	{
 		pause();
+		kill();
 	}
 	return (0);
 }
