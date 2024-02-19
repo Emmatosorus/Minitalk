@@ -6,34 +6,13 @@
 /*   By: epolitze <epolitze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 20:24:35 by epolitze          #+#    #+#             */
-/*   Updated: 2024/02/19 16:27:15 by epolitze         ###   ########.fr       */
+/*   Updated: 2024/02/19 18:21:43 by epolitze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
 int	g_sigaction_c;
-
-void	get_pid(int *pid, char *nb)
-{
-	int	i;
-
-	i = -1;
-	while (nb[++i] != '\0')
-	{
-		if (ft_isdigit(nb[i]) != 1)
-		{
-			ft_printf(2, "\x1b[1;31mERROR\nPID must be a number\x1b[0m");
-			exit(EXIT_FAILURE);
-		}
-	}
-	*pid = ft_atoi(nb);
-	if (kill(*pid, 0) == -1)
-	{
-		ft_printf(2, "\x1b[1;31mERROR\nNo process of ID: %d\x1b[0m", *pid);
-			exit(EXIT_FAILURE);
-	}
-}
 
 void	msg_received(int sig)
 {
@@ -57,6 +36,8 @@ void	send_char(int pid, int c)
 	}
 }
 
+send int 
+
 int	main(int ac, char **av)
 {
 	size_t				len;
@@ -64,17 +45,12 @@ int	main(int ac, char **av)
 	struct sigaction	act;
 
 	if (ac < 3)
-	{
-		ft_printf(2, "\x1b[1;31mERROR\n");
-		ft_printf(2, "Client must be called as: ./client <PID> <msg>\x1b[0m");
-		exit(EXIT_FAILURE);
-	}
+		input_error();
 	get_pid(&pid, av[1]);
 	act.sa_handler = &msg_received;
 	act.sa_flags = SA_SIGINFO;
 	sigemptyset(&act.sa_mask);
 	sigaction(SIGUSR1, &act, NULL);
-	sigaction(SIGUSR2, &act, NULL);
 	len = ft_strlen(av[2]);
 	while (--len >= 0)
 	{
