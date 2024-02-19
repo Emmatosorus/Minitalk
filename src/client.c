@@ -6,11 +6,13 @@
 /*   By: epolitze <epolitze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 20:24:35 by epolitze          #+#    #+#             */
-/*   Updated: 2024/02/15 10:31:40 by epolitze         ###   ########.fr       */
+/*   Updated: 2024/02/19 16:27:15 by epolitze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
+
+int	g_sigaction_c;
 
 void	get_pid(int *pid, char *nb)
 {
@@ -31,6 +33,11 @@ void	get_pid(int *pid, char *nb)
 		ft_printf(2, "\x1b[1;31mERROR\nNo process of ID: %d\x1b[0m", *pid);
 			exit(EXIT_FAILURE);
 	}
+}
+
+void	msg_received(int sig)
+{
+	g_sigaction_c = 1;
 }
 
 void	send_char(int pid, int c)
@@ -63,15 +70,18 @@ int	main(int ac, char **av)
 		exit(EXIT_FAILURE);
 	}
 	get_pid(&pid, av[1]);
-	act.sa_handler = &send_char;
+	act.sa_handler = &msg_received;
 	act.sa_flags = SA_SIGINFO;
 	sigemptyset(&act.sa_mask);
 	sigaction(SIGUSR1, &act, NULL);
 	sigaction(SIGUSR2, &act, NULL);
 	len = ft_strlen(av[2]);
-	while (len > 0)
+	while (--len >= 0)
 	{
-		len--;
-		pause();
+		if (g_sigaction_c != 2)
+			g_sigaction_c = 2;
+		while (g_sigaction_c == 2)
+			continue ;
+		send_char(pid, av[2][len]);
 	}
 }
