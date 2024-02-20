@@ -6,7 +6,7 @@
 /*   By: epolitze <epolitze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 13:51:19 by epolitze          #+#    #+#             */
-/*   Updated: 2024/02/20 15:58:16 by epolitze         ###   ########.fr       */
+/*   Updated: 2024/02/20 16:33:06 by epolitze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,8 @@ void	get_message(int sig, siginfo_t *info, void *context)
 	{
 		ft_printf(1, "\n");
 		ft_printf(1, "size = %d\n", len);
+		s = -1;
+		len = 0;
 		// if (!str)
 		// 	str = ft_calloc(len, sizeof(char));
 		// if (!str)

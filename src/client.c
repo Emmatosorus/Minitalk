@@ -6,7 +6,7 @@
 /*   By: epolitze <epolitze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 13:51:07 by epolitze          #+#    #+#             */
-/*   Updated: 2024/02/20 15:59:27 by epolitze         ###   ########.fr       */
+/*   Updated: 2024/02/20 16:23:30 by epolitze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,15 +41,9 @@ void	send_size_t(int len, int pid)
 	static int	i = (sizeof(size_t) * 8) - 1;
 	
 	if ((len >> i) & 1)
-	{
 		kill(pid, SIGUSR1);
-		//ft_printf(1, "1");
-	}
 	else
-	{
 		kill(pid, SIGUSR2);
-		//ft_printf(1, "0");
-	}
 	i--;
 }
 
