@@ -24,6 +24,7 @@ S_SRC = \
 S_OBJ = $(S_SRC:%.c=$(OBJ_DIR)%.o)
 
 C_SRC = \
+	src/client_tools.c \
 	src/client.c
 
 C_OBJ = $(C_SRC:%.c=$(OBJ_DIR)%.o)
@@ -49,6 +50,9 @@ $(LIB_AR): force
 clean:
 	$(MAKE) -C libft clean
 	rm -rf $(OBJ_DIR)
+
+fclean: clean
+	rm -rf $(NAME_S) $(NAME_C)
 
 re: fclean all
 

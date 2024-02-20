@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: epolitze <epolitze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/12 20:24:35 by epolitze          #+#    #+#             */
-/*   Updated: 2024/02/19 18:21:43 by epolitze         ###   ########.fr       */
+/*   Created: 2024/02/20 13:51:07 by epolitze          #+#    #+#             */
+/*   Updated: 2024/02/20 15:59:27 by epolitze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,31 +16,63 @@ int	g_sigaction_c;
 
 void	msg_received(int sig)
 {
+	(void)sig;
 	g_sigaction_c = 1;
 }
 
 void	send_char(int pid, int c)
 {
-	int	i;
+	static int	i = (sizeof(char) * 8) - 1;
 
-	i = (sizeof(char) * 8) - 1;
-	(void)pid;
-	while (i >= 0)
+	if (i > 0)
 	{
 		if ((c >> i) & 1)
 			kill(pid, SIGUSR1);
 		else
 			kill(pid, SIGUSR2);
-		usleep(100);
 		i--;
 	}
+	else
+		i = (sizeof(char) * 8) - 1;
 }
 
-send int 
+void	send_size_t(int len, int pid)
+{
+	static int	i = (sizeof(size_t) * 8) - 1;
+	
+	if ((len >> i) & 1)
+	{
+		kill(pid, SIGUSR1);
+		//ft_printf(1, "1");
+	}
+	else
+	{
+		kill(pid, SIGUSR2);
+		//ft_printf(1, "0");
+	}
+	i--;
+}
+
+void	send_sig(int pid, char *str, int len)
+{
+	static int	s = -1;
+	//static int	pos = 0;
+
+	if (++s < 32)
+		send_size_t(len, pid);
+	else {
+		ft_printf(1, "sent all\n");
+		kill(pid, SIGUSR1);
+		exit(EXIT_SUCCESS);}
+		// if (pos < len)
+		// 	send_char(pid, str[pos++]);
+	(void)str;
+}
 
 int	main(int ac, char **av)
 {
-	size_t				len;
+	ssize_t				len;
+	ssize_t				count;
 	int					pid;
 	struct sigaction	act;
 
@@ -52,12 +84,13 @@ int	main(int ac, char **av)
 	sigemptyset(&act.sa_mask);
 	sigaction(SIGUSR1, &act, NULL);
 	len = ft_strlen(av[2]);
-	while (--len >= 0)
+	count = len + 64;
+	while (--count >= 0)
 	{
+		send_sig(pid, av[2], len);
 		if (g_sigaction_c != 2)
 			g_sigaction_c = 2;
 		while (g_sigaction_c == 2)
 			continue ;
-		send_char(pid, av[2][len]);
 	}
 }
