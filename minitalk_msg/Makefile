@@ -52,6 +52,7 @@ clean:
 	rm -rf $(OBJ_DIR)
 
 fclean: clean
+	rm -rf $(LIB_AR)
 	rm -rf $(NAME_S) $(NAME_C)
 
 re: fclean all
