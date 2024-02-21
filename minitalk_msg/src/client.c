@@ -6,7 +6,7 @@
 /*   By: epolitze <epolitze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 13:51:07 by epolitze          #+#    #+#             */
-/*   Updated: 2024/02/21 12:47:37 by epolitze         ###   ########.fr       */
+/*   Updated: 2024/02/21 13:51:21 by epolitze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,10 @@ void	msg_received(int sig)
 {
 	(void)sig;
 	if (sig == SIGUSR2)
-		write(1, "gm\n", 3);
+	{
+		ft_printf(1, "\x1b[1;31mServer has failed\n\x1b[0m");
+		exit(EXIT_FAILURE);
+	}
 	g_sigaction_c = 1;
 }
 
@@ -29,15 +32,9 @@ void	send_char(int pid, int c)
 	if (i >= 0)
 	{
 		if ((c >> i) & 1)
-		{
 			kill(pid, SIGUSR1);
-			write(1, "1", 1);
-		}
 		else
-		{
 			kill(pid, SIGUSR2);
-			write(1, "0", 1);
-		}
 		i--;
 	}
 	if (i < 0)
@@ -68,7 +65,6 @@ void	send_sig(int pid, char *str, int len)
 	{
 		pos++;
 		i = 8;
-		//write(1, "\n", 1);
 	}
 }
 

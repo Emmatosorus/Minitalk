@@ -6,7 +6,7 @@
 /*   By: epolitze <epolitze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 13:51:19 by epolitze          #+#    #+#             */
-/*   Updated: 2024/02/21 13:22:24 by epolitze         ###   ########.fr       */
+/*   Updated: 2024/02/21 13:51:44 by epolitze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,9 @@
 
 int	g_sigaction_s;
 
-void	error_exit(void)
+void	error_exit(int pid)
 {
+	kill(pid, SIGUSR2);
 	ft_printf(1, "\x1b[1;31mERROR\nft_calloc has failed\x1b[0m");
 	exit(EXIT_FAILURE);
 }
@@ -67,21 +68,14 @@ void	get_message(int sig, siginfo_t *info, void *context)
 	{
 		c <<= 1;
 		if (sig == SIGUSR1)
-		{
 			c |= 1;
-			//write(1, "1", 1);
-		}
 		else
-		{
 			c |= 0;
-			//write(1, "0", 1);
-		}
 		s++;
 	}
 	if (s == 8)
 	{
 		write(1, &c, 1);
-		kill(pid, SIGUSR2);
 		c = 0;
 		s = 0;
 		//len = 0;
@@ -97,7 +91,11 @@ void	get_message(int sig, siginfo_t *info, void *context)
 		// 	write(1, &str, len);
 		// 	free(str);
 		// }
-	kill(pid, SIGUSR1);
+	if (kill(pid, SIGUSR1) == -1)
+	{
+		c = 0;
+		s = 0;
+	}
 }
 
 int	main(void)
