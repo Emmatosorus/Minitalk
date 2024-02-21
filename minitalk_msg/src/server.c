@@ -6,7 +6,7 @@
 /*   By: epolitze <epolitze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 13:51:19 by epolitze          #+#    #+#             */
-/*   Updated: 2024/02/20 16:52:59 by epolitze         ###   ########.fr       */
+/*   Updated: 2024/02/21 10:49:44 by epolitze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,14 +20,14 @@ void	error_exit(void)
 	exit(EXIT_FAILURE);
 }
 
-void	get_size(int sig, int *len)
-{
-	*len <<= 1;
-	if (sig == SIGUSR1)
-		*len |= 1;
-	else
-		*len |= 0;
-}
+// void	get_size(int sig, int *len)
+// {
+// 	*len <<= 1;
+// 	if (sig == SIGUSR1)
+// 		*len |= 1;
+// 	else
+// 		*len |= 0;
+// }
 
 void	get_char(int sig, char **str)
 {
@@ -56,29 +56,36 @@ void	get_char(int sig, char **str)
 void	get_message(int sig, siginfo_t *info, void *context)
 {
 	int			pid;
-	static char	c = 0;
+	static int	c = 0;
 	static int	s = 0;
 	//static int	len = 0;
 
 	pid = info->si_pid;
 	g_sigaction_s = 1;
 	(void)context;
-	if (s < 8)
+	if (s <= 8)
 	{
 		c <<= 1;
 		if (sig == SIGUSR1)
+		{
 			c |= 1;
+			//write(1, "1", 1);
+		}
 		else
+		{
 			c |= 0;
+			//write(1, "0", 1);
+		}
 		s++;
 	}
-	else
+	if (s == 8)
 	{
 		write(1, &c, 1);
 		c = 0;
-		s = -1;
+		s = 0;
 		//len = 0;
 	}
+	//write(1, &c, 1);
 		// if (!str)
 		// 	str = ft_calloc(len, sizeof(char));
 		// if (!str)
