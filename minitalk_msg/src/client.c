@@ -6,7 +6,7 @@
 /*   By: epolitze <epolitze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 13:51:07 by epolitze          #+#    #+#             */
-/*   Updated: 2024/02/21 10:53:50 by epolitze         ###   ########.fr       */
+/*   Updated: 2024/02/21 12:47:37 by epolitze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ int	g_sigaction_c;
 void	msg_received(int sig)
 {
 	(void)sig;
+	if (sig == SIGUSR2)
+		write(1, "gm\n", 3);
 	g_sigaction_c = 1;
 }
 
@@ -38,7 +40,7 @@ void	send_char(int pid, int c)
 		}
 		i--;
 	}
-	else
+	if (i < 0)
 		i = (sizeof(char) * 8) - 1;
 }
 
@@ -56,18 +58,18 @@ void	send_char(int pid, int c)
 void	send_sig(int pid, char *str, int len)
 {
 	static int	pos = 0;
-	static int	i = 0;
+	static int	i = 8;
 
-	i++;
+	g_sigaction_c = 2;
+	i--;
 	if (pos < len)
 		send_char(pid, str[pos]);
-	if (i == 8)
+	if (i <= 0)
 	{
 		pos++;
-		i = 0;
-		write(1, "\n", 1);
+		i = 8;
+		//write(1, "\n", 1);
 	}
-	//ft_printf(1, "%d\n", i);
 }
 
 int	main(int ac, char **av)
@@ -84,13 +86,12 @@ int	main(int ac, char **av)
 	act.sa_flags = SA_SIGINFO;
 	sigemptyset(&act.sa_mask);
 	sigaction(SIGUSR1, &act, NULL);
+	sigaction(SIGUSR2, &act, NULL);
 	len = ft_strlen(av[2]);
 	count = len * 8;
 	while (--count >= 0)
 	{
 		send_sig(pid, av[2], len);
-		if (g_sigaction_c != 2)
-			g_sigaction_c = 2;
 		while (g_sigaction_c == 2)
 			continue ;
 	}

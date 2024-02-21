@@ -6,7 +6,7 @@
 /*   By: epolitze <epolitze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 13:51:19 by epolitze          #+#    #+#             */
-/*   Updated: 2024/02/21 10:49:44 by epolitze         ###   ########.fr       */
+/*   Updated: 2024/02/21 13:22:24 by epolitze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ void	get_char(int sig, char **str)
 void	get_message(int sig, siginfo_t *info, void *context)
 {
 	int			pid;
-	static int	c = 0;
+	static char	c = 0;
 	static int	s = 0;
 	//static int	len = 0;
 
@@ -81,6 +81,7 @@ void	get_message(int sig, siginfo_t *info, void *context)
 	if (s == 8)
 	{
 		write(1, &c, 1);
+		kill(pid, SIGUSR2);
 		c = 0;
 		s = 0;
 		//len = 0;
