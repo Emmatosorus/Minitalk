@@ -6,7 +6,7 @@
 /*   By: epolitze <epolitze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 13:51:19 by epolitze          #+#    #+#             */
-/*   Updated: 2024/02/22 12:16:50 by epolitze         ###   ########.fr       */
+/*   Updated: 2024/02/22 14:21:48 by epolitze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,11 +32,13 @@ void	get_size(int sig, int pid, size_t *len)
 		*len = 0;
 }
 
-void	get_char(int sig, int pid)
+int	get_char(int sig, int pid)
 {
 	static char	c = 0;
 	static int	s = 0;
+	char		buf;
 
+	buf = -1;
 	if (s <= 8)
 	{
 		c <<= 1;
@@ -48,20 +50,21 @@ void	get_char(int sig, int pid)
 	}
 	if (s == 8)
 	{
-		write(1, &c, 1);
-		c = 0;
-		s = 0;
+		write (1, &c, 1);
+		buf = c;
 	}
-	if (kill(pid, SIGUSR1) == -1)
+	if (kill(pid, SIGUSR1) == -1 || s == 8)
 	{
 		c = 0;
 		s = 0;
 	}
+	return (buf);
 }
 
 void	get_message(int sig, siginfo_t *info, void *context)
 {
 	int				pid;
+	static int		state = 0;
 	static int		size = 0;
 	static size_t	len = 0;
 	//static char		*str = NULL;
@@ -69,10 +72,21 @@ void	get_message(int sig, siginfo_t *info, void *context)
 	(void)context;
 	pid = info->si_pid;
 	g_sigaction_s = 1;
-	if (++size <= 64)
+	if (state == 0 && ++size <= 64)
+	{
 		get_size(sig, pid, &len);
+		if (size == 64)
+		{
+			ft_printf(1, "%d\n", len);
+			size = 0;
+			state = 1;
+		}
+	}
 	else
-		get_char(sig, pid);
+	{
+		if (get_char(sig, pid) == 0)
+			state = 0;
+	}
 	if (kill(pid, 0) == -1)
 		size = 0;
 	// if (!str)
@@ -84,7 +98,6 @@ void	get_message(int sig, siginfo_t *info, void *context)
 	// 	else
 	// 		free(str);
 	// }
-	//get_char(sig, pid);
 }
 
 int	main(void)
