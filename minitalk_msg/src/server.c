@@ -6,7 +6,7 @@
 /*   By: epolitze <epolitze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 13:51:19 by epolitze          #+#    #+#             */
-/*   Updated: 2024/02/22 19:16:09 by epolitze         ###   ########.fr       */
+/*   Updated: 2024/02/22 19:57:36 by epolitze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,10 +42,7 @@ int	make_char(int sig, int pid)
 		s++;
 	}
 	if (s == 8)
-	{
-		write (1, &c, 1);
 		buf = c;
-	}
 	if (kill(pid, SIGUSR1) == -1 || s == 8)
 	{
 		c = 0;
@@ -57,17 +54,28 @@ int	make_char(int sig, int pid)
 void	get_char(int sig, int pid, int len, int *state)
 {
 	static char		*str = NULL;
+	static int		pos = 0;
+	static int		bits = 0;
 	char			c;
 
 	c = make_char(sig, pid);
+	if (++bits >= 8)
+	{
+		bits = 0;
+		str[pos++] = c;
+	}
 	if (c == 0)
 	{
 		*state = 0;
-		free(str);
+		pos = 0;
+		ft_printf(1, "%s\n", str);
+		if (str)
+			free(str);
+		str = NULL;
 	}
 	if (!str)
 	{
-		str = malloc(len * sizeof(char));
+		str = ft_calloc((len + 1), sizeof(char));
 		if (!str)
 			error_exit(pid);
 	}
@@ -88,7 +96,6 @@ void	get_message(int sig, siginfo_t *info, void *context)
 		get_size(sig, pid, &len);
 		if (size == 64)
 		{
-			ft_printf(1, "%d\n", len);
 			size = 0;
 			state = 1;
 		}
@@ -98,16 +105,6 @@ void	get_message(int sig, siginfo_t *info, void *context)
 	if (kill(pid, 0) == -1)
 		size = 0;
 }
-
-// if (!str)
-// {
-// 	ft_printf(1, "%d\n", len);
-// 	str = malloc((len + 1) * sizeof(char));
-// 	if (!str)
-// 		error_exit(pid);
-// 	else
-// 		free(str);
-// }
 
 int	main(void)
 {
