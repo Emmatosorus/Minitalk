@@ -6,7 +6,7 @@
 /*   By: epolitze <epolitze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 13:51:07 by epolitze          #+#    #+#             */
-/*   Updated: 2024/02/22 10:42:56 by epolitze         ###   ########.fr       */
+/*   Updated: 2024/02/22 12:05:44 by epolitze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,21 +55,22 @@ void	send_size_t(int len, int pid)
 void	send_sig(int pid, char *str, size_t len)
 {
 	static size_t	pos = 0;
-	static int		i = 8;
-	static int		j = -1;
+	static int		i = 0;
+	static int		size = 0;
 
 	g_sigaction_c = 2;
-	if (++j < 64)
+	(void)str;
+	if (++size <= 64)
 		send_size_t(len, pid);
 	else
 	{
-		i--;
+		i++;
 		if (pos < len)
 			send_char(pid, str[pos]);
-		if (i <= 0)
+		if (i >= 8)
 		{
 			pos++;
-			i = 8;
+			i = 0;
 		}
 	}
 }
@@ -90,7 +91,7 @@ int	main(int ac, char **av)
 	sigaction(SIGUSR1, &act, NULL);
 	sigaction(SIGUSR2, &act, NULL);
 	len = ft_strlen(av[2]);
-	count = len * 8;
+	count = (len * 8) + 64;
 	while (--count >= 0)
 	{
 		send_sig(pid, av[2], len);

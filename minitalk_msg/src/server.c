@@ -6,7 +6,7 @@
 /*   By: epolitze <epolitze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 13:51:19 by epolitze          #+#    #+#             */
-/*   Updated: 2024/02/22 10:43:38 by epolitze         ###   ########.fr       */
+/*   Updated: 2024/02/22 12:16:50 by epolitze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,49 +62,27 @@ void	get_char(int sig, int pid)
 void	get_message(int sig, siginfo_t *info, void *context)
 {
 	int				pid;
-	static int		size = -1;
+	static int		size = 0;
 	static size_t	len = 0;
-	static char	c = 0;
-	static int	s = 0;
 	//static char		*str = NULL;
 
 	(void)context;
 	pid = info->si_pid;
 	g_sigaction_s = 1;
-	if (++size < 64)
+	if (++size <= 64)
 		get_size(sig, pid, &len);
 	else
-	{
-		if (s <= 8)
-		{
-			c <<= 1;
-			if (sig == SIGUSR1)
-				c |= 1;
-			else
-				c |= 0;
-			s++;
-		}
-		if (s == 8)
-		{
-			write(1, &c, 1);
-			ft_printf()
-			c = 0;
-			s = 0;
-		}
-		if (kill(pid, SIGUSR1) == -1)
-		{
-			c = 0;
-			s = 0;
-		}
-	}
-	if (size == 64)
-		ft_printf(1, "%d\n", len);
+		get_char(sig, pid);
+	if (kill(pid, 0) == -1)
+		size = 0;
 	// if (!str)
 	// {
 	// 	ft_printf(1, "%d\n", len);
 	// 	str = malloc((len + 1) * sizeof(char));
 	// 	if (!str)
 	// 		error_exit(pid);
+	// 	else
+	// 		free(str);
 	// }
 	//get_char(sig, pid);
 }
