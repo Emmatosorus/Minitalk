@@ -6,7 +6,7 @@
 /*   By: epolitze <epolitze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 13:51:07 by epolitze          #+#    #+#             */
-/*   Updated: 2024/02/21 13:51:21 by epolitze         ###   ########.fr       */
+/*   Updated: 2024/02/22 10:42:56 by epolitze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,36 +41,42 @@ void	send_char(int pid, int c)
 		i = (sizeof(char) * 8) - 1;
 }
 
-// void	send_size_t(int len, int pid)
-// {
-// 	static int	i = (sizeof(size_t) * 8) - 1;
-	
-// 	if ((len >> i) & 1)
-// 		kill(pid, SIGUSR1);
-// 	else
-// 		kill(pid, SIGUSR2);
-// 	i--;
-// }
-
-void	send_sig(int pid, char *str, int len)
+void	send_size_t(int len, int pid)
 {
-	static int	pos = 0;
-	static int	i = 8;
+	static int	i = (sizeof(size_t) * 8) - 1;
+	
+	if ((len >> i) & 1)
+		kill(pid, SIGUSR1);
+	else
+		kill(pid, SIGUSR2);
+	i--;
+}
+
+void	send_sig(int pid, char *str, size_t len)
+{
+	static size_t	pos = 0;
+	static int		i = 8;
+	static int		j = -1;
 
 	g_sigaction_c = 2;
-	i--;
-	if (pos < len)
-		send_char(pid, str[pos]);
-	if (i <= 0)
+	if (++j < 64)
+		send_size_t(len, pid);
+	else
 	{
-		pos++;
-		i = 8;
+		i--;
+		if (pos < len)
+			send_char(pid, str[pos]);
+		if (i <= 0)
+		{
+			pos++;
+			i = 8;
+		}
 	}
 }
 
 int	main(int ac, char **av)
 {
-	ssize_t				len;
+	size_t				len;
 	ssize_t				count;
 	int					pid;
 	struct sigaction	act;
