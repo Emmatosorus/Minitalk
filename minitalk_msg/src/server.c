@@ -6,20 +6,13 @@
 /*   By: epolitze <epolitze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 13:51:19 by epolitze          #+#    #+#             */
-/*   Updated: 2024/02/22 14:21:48 by epolitze         ###   ########.fr       */
+/*   Updated: 2024/02/22 19:16:09 by epolitze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
 int	g_sigaction_s;
-
-void	error_exit(int pid)
-{
-	kill(pid, SIGUSR2);
-	ft_printf(1, "\x1b[1;31mERROR\nft_calloc has failed\x1b[0m");
-	exit(EXIT_FAILURE);
-}
 
 void	get_size(int sig, int pid, size_t *len)
 {
@@ -32,7 +25,7 @@ void	get_size(int sig, int pid, size_t *len)
 		*len = 0;
 }
 
-int	get_char(int sig, int pid)
+int	make_char(int sig, int pid)
 {
 	static char	c = 0;
 	static int	s = 0;
@@ -61,13 +54,31 @@ int	get_char(int sig, int pid)
 	return (buf);
 }
 
+void	get_char(int sig, int pid, int len, int *state)
+{
+	static char		*str = NULL;
+	char			c;
+
+	c = make_char(sig, pid);
+	if (c == 0)
+	{
+		*state = 0;
+		free(str);
+	}
+	if (!str)
+	{
+		str = malloc(len * sizeof(char));
+		if (!str)
+			error_exit(pid);
+	}
+}
+
 void	get_message(int sig, siginfo_t *info, void *context)
 {
 	int				pid;
 	static int		state = 0;
 	static int		size = 0;
 	static size_t	len = 0;
-	//static char		*str = NULL;
 
 	(void)context;
 	pid = info->si_pid;
@@ -83,22 +94,20 @@ void	get_message(int sig, siginfo_t *info, void *context)
 		}
 	}
 	else
-	{
-		if (get_char(sig, pid) == 0)
-			state = 0;
-	}
+		get_char(sig, pid, len, &state);
 	if (kill(pid, 0) == -1)
 		size = 0;
-	// if (!str)
-	// {
-	// 	ft_printf(1, "%d\n", len);
-	// 	str = malloc((len + 1) * sizeof(char));
-	// 	if (!str)
-	// 		error_exit(pid);
-	// 	else
-	// 		free(str);
-	// }
 }
+
+// if (!str)
+// {
+// 	ft_printf(1, "%d\n", len);
+// 	str = malloc((len + 1) * sizeof(char));
+// 	if (!str)
+// 		error_exit(pid);
+// 	else
+// 		free(str);
+// }
 
 int	main(void)
 {

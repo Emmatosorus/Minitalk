@@ -1,29 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minitalk.h                                         :+:      :+:    :+:   */
+/*   server_tools.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: epolitze <epolitze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/20 13:51:48 by epolitze          #+#    #+#             */
-/*   Updated: 2024/02/22 19:07:55 by epolitze         ###   ########.fr       */
+/*   Created: 2024/02/22 19:03:15 by epolitze          #+#    #+#             */
+/*   Updated: 2024/02/22 19:06:35 by epolitze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINITALK_H
-# define MINITALK_H
+#include "minitalk.h"
 
-# include <signal.h>
-# include <unistd.h>
-# include <stdlib.h>
-# include <sys/types.h>
-# include "../libft/libft.h"
-
-/*-------- Client --------*/
-void	get_pid(int *pid, char *nb);
-void	input_error(void);
-
-/*-------- Server --------*/
-void	error_exit(int pid);
-
-#endif
+void	error_exit(int pid)
+{
+	kill(pid, SIGUSR2);
+	ft_printf(1, "\x1b[1;31mERROR\nft_calloc has failed\x1b[0m");
+	exit(EXIT_FAILURE);
+}

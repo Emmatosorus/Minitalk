@@ -19,6 +19,7 @@ OBJ_DIR = .obj/
 #--------Sources--------#
 
 S_SRC = \
+	src/server_tools.c \
 	src/server.c
 
 S_OBJ = $(S_SRC:%.c=$(OBJ_DIR)%.o)
