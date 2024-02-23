@@ -4,7 +4,7 @@ NAME_C = client
 
 CC = cc
 
-CFLAGS = -Wall -Wextra -Werror #-fsanitize=address
+CFLAGS = -Wall -Wextra -Werror #-fsanitize=address -g3
 
 HDR = src/minitalk.h
 

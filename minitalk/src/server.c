@@ -6,7 +6,7 @@
 /*   By: epolitze <epolitze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 13:51:19 by epolitze          #+#    #+#             */
-/*   Updated: 2024/02/23 10:03:07 by epolitze         ###   ########.fr       */
+/*   Updated: 2024/02/23 10:38:55 by epolitze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,24 +50,24 @@ int	make_char(int sig, int pid)
 	}
 	return (buf);
 }
-
+#include <stdio.h>
 void	get_char(int sig, int pid, int len, int *state)
 {
 	static char		*str = NULL;
 	static int		counter[2] = {0, 0};
 	char			c;
 
-	c = make_char(sig, pid);
-	if (++counter[0] >= 8)
-	{
-		counter[0] = 0;
-		str[counter[1]++] = c;
-	}
 	if (!str)
 	{
 		str = ft_calloc((len + 1), sizeof(char));
 		if (!str)
 			error_exit(pid);
+	}
+	c = make_char(sig, pid);
+	if (++counter[0] >= 8)
+	{
+		counter[0] = 0;
+		str[counter[1]++] = c;
 	}
 	if (c == 0)
 	{
