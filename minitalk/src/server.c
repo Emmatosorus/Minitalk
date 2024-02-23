@@ -6,7 +6,7 @@
 /*   By: epolitze <epolitze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 13:51:19 by epolitze          #+#    #+#             */
-/*   Updated: 2024/02/20 16:33:06 by epolitze         ###   ########.fr       */
+/*   Updated: 2024/02/23 10:03:07 by epolitze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,75 +14,95 @@
 
 int	g_sigaction_s;
 
-void	error_exit(void)
-{
-	ft_printf(1, "\x1b[1;31mERROR\nft_calloc has failed\x1b[0m");
-	exit(EXIT_FAILURE);
-}
-
-void	get_size(int sig, int *len)
+void	get_size(int sig, int pid, size_t *len)
 {
 	*len <<= 1;
 	if (sig == SIGUSR1)
 		*len |= 1;
 	else
 		*len |= 0;
+	if (kill(pid, SIGUSR1) == -1)
+		*len = 0;
 }
 
-void	get_char(int sig, char **str)
+int	make_char(int sig, int pid)
 {
-	static char		result = 0;
-	static int		i = 0;
-	static int		pos = 0;
+	static char	c = 0;
+	static int	s = 0;
+	char		buf;
 
-	if (i < 8)
+	buf = -1;
+	if (s <= 8)
 	{
-		result <<= 1;
+		c <<= 1;
 		if (sig == SIGUSR1)
-			result |= 1;
+			c |= 1;
 		else
-			result |= 0;
-		i++;
+			c |= 0;
+		s++;
 	}
-	if (i == 8)
+	if (s == 8)
+		buf = c;
+	if (kill(pid, SIGUSR1) == -1 || s == 8)
 	{
-		*str[pos] = result;
-		result = 0;
-		i = 0;
-		pos++;
+		c = 0;
+		s = 0;
+	}
+	return (buf);
+}
+
+void	get_char(int sig, int pid, int len, int *state)
+{
+	static char		*str = NULL;
+	static int		counter[2] = {0, 0};
+	char			c;
+
+	c = make_char(sig, pid);
+	if (++counter[0] >= 8)
+	{
+		counter[0] = 0;
+		str[counter[1]++] = c;
+	}
+	if (!str)
+	{
+		str = ft_calloc((len + 1), sizeof(char));
+		if (!str)
+			error_exit(pid);
+	}
+	if (c == 0)
+	{
+		*state = 0;
+		counter[1] = 0;
+		ft_printf(1, "%s\n", str);
+		if (str)
+			free(str);
+		str = NULL;
 	}
 }
 
 void	get_message(int sig, siginfo_t *info, void *context)
 {
-	int			pid;
-	//static char	*str = NULL;
-	static int	s = -1;
-	static int	len = 0;
+	int				pid;
+	static int		state = 0;
+	static int		size = 0;
+	static size_t	len = 0;
 
+	(void)context;
 	pid = info->si_pid;
 	g_sigaction_s = 1;
-	(void)context;
-	if (++s < 32)
-		get_size(sig, &len);
-	else
+	if (state == 0 && ++size <= 64)
 	{
-		ft_printf(1, "\n");
-		ft_printf(1, "size = %d\n", len);
-		s = -1;
-		len = 0;
-		// if (!str)
-		// 	str = ft_calloc(len, sizeof(char));
-		// if (!str)
-		// 	error_exit();
-		// get_char(sig, &str);
-		// if (str[len - 2] != 0)
-		// {
-		// 	write(1, &str, len);
-		// 	free(str);
-		// }
+		get_size(sig, pid, &len);
+		if (size == 64)
+		{
+			size = 0;
+			state = 1;
+		}
 	}
-	kill(pid, SIGUSR1);
+	else
+		get_char(sig, pid, len, &state);
+	if (kill(pid, 0) == -1)
+		size = 0;
 }
 
 int	main(void)
