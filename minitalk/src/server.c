@@ -6,7 +6,7 @@
 /*   By: epolitze <epolitze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 13:51:19 by epolitze          #+#    #+#             */
-/*   Updated: 2024/02/23 10:38:55 by epolitze         ###   ########.fr       */
+/*   Updated: 2024/02/23 10:58:18 by epolitze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ int	make_char(int sig, int pid)
 	}
 	return (buf);
 }
-#include <stdio.h>
+
 void	get_char(int sig, int pid, int len, int *state)
 {
 	static char		*str = NULL;
